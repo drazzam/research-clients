@@ -8,6 +8,7 @@ import { Switch } from './ui/switch';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 type Project = {
   id: string;
@@ -145,24 +146,24 @@ const ProjectList = () => {
   const exportProjects = (projectType: 'ongoing' | 'completed') => {
     const projectsToExport = projectType === 'ongoing' ? ongoingProjects : completedProjects;
     const exportData = projectsToExport.map(project => ({
-      name: project.name,
-      deadline: format(project.deadline, 'MMM dd, yyyy'),
-      client: project.client,
-      description: project.description,
-      notes: project.notes || 'No notes',
-      driveLink: project.driveLink || 'No link',
-      status: project.isCompleted ? 'Completed' : 'Ongoing'
+      'Project Name': project.name,
+      'Deadline': format(project.deadline, 'MMM dd, yyyy'),
+      'Client': project.client,
+      'Description': project.description,
+      'Notes': project.notes || 'No notes',
+      'Drive Link': project.driveLink || 'No link',
+      'Status': project.isCompleted ? 'Completed' : 'Ongoing'
     }));
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${projectType}-projects-${format(new Date(), 'yyyy-MM-dd')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, projectType === 'ongoing' ? 'Ongoing Projects' : 'Completed Projects');
+    
+    // Generate file name with current date
+    const fileName = `${projectType}-projects-${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+    
+    // Save the file
+    XLSX.writeFile(wb, fileName);
     toast.success(`${projectType === 'ongoing' ? 'Ongoing' : 'Completed'} projects exported successfully!`);
   };
 
