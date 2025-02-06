@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Plus, Upload } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 type ProjectFormData = {
   name: string;
@@ -104,7 +104,7 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
         <FormField
           control={form.control}
           name="files"
-          render={({ field: { onChange, ...field } }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>Attachments</FormLabel>
               <FormControl>
@@ -112,7 +112,11 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
                   <Input
                     type="file"
                     multiple
-                    onChange={(e) => onChange(e.target.files)}
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        onChange(e.target.files);
+                      }
+                    }}
                     {...field}
                     className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
                   />

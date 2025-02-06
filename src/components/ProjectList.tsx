@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ArrowUpDown, Calendar, User, FileText, CheckCircle, XCircle, Paperclip } from 'lucide-react';
+import { ArrowUpDown, Calendar, User, FileText, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProjectForm from './ProjectForm';
 import { Badge } from './ui/badge';
@@ -15,7 +15,7 @@ type Project = {
   description: string;
   isCompleted: boolean;
   notes?: string;
-  files?: File[];
+  files: File[];
 };
 
 const ProjectList = () => {
@@ -97,8 +97,14 @@ const ProjectList = () => {
   };
 
   const handleAddProject = (formData: any) => {
-    const files = Array.from(formData.files || []);
-    const newProject = {
+    const fileArray = Array.from(formData.files || []).map((file: any) => {
+      return new File([file], file.name, {
+        type: file.type,
+        lastModified: file.lastModified,
+      });
+    });
+
+    const newProject: Project = {
       id: (projects.length + 1).toString(),
       name: formData.name,
       deadline: new Date(formData.deadline),
@@ -106,8 +112,9 @@ const ProjectList = () => {
       description: formData.description,
       isCompleted: false,
       notes: formData.notes,
-      files: files
+      files: fileArray
     };
+    
     setProjects([...projects, newProject]);
     toast.success("Project added successfully!");
   };
@@ -116,19 +123,16 @@ const ProjectList = () => {
     setProjects(projects.map(project => {
       if (project.id === projectId) {
         const newStatus = !project.isCompleted;
-        toast({
-          title: newStatus ? "Project completed" : "Project reopened",
-          description: `Project "${project.name}" has been ${newStatus ? 'marked as complete' : 'moved back to ongoing projects'}.`,
-        });
+        toast.success(newStatus ? "Project completed" : "Project reopened");
         return { ...project, isCompleted: newStatus };
       }
       return project;
     }));
   };
 
-  const ProjectTable = ({ projects, title }: { projects: Project[], title: string }) => (
+  const ProjectTable = ({ projects, heading }: { projects: Project[], heading: string }) => (
     <div className="bg-card rounded-lg shadow-sm border overflow-x-auto mt-8">
-      <h2 className="text-xl font-semibold p-4 border-b">{title}</h2>
+      <h2 className="text-xl font-semibold p-4 border-b">{heading}</h2>
       <div className="min-w-[800px]">
         <div className="grid grid-cols-7 gap-4 p-4 font-medium border-b">
           <button onClick={() => sortProjects('name')} className="sort-button">
@@ -197,8 +201,8 @@ const ProjectList = () => {
       
       <ProjectForm onSubmit={handleAddProject} />
 
-      <ProjectTable projects={ongoingProjects} title="Ongoing Projects" />
-      <ProjectTable projects={completedProjects} title="Completed Projects" />
+      <ProjectTable projects={ongoingProjects} heading="Ongoing Projects" />
+      <ProjectTable projects={completedProjects} heading="Completed Projects" />
     </div>
   );
 };
