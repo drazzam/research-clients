@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ArrowUpDown, Calendar, User, FileText, Link as LinkIcon, Download, Pencil } from 'lucide-react';
+import { ArrowUpDown, Calendar, User, FileText, Link as LinkIcon, Download, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProjectForm from './ProjectForm';
 import { Badge } from './ui/badge';
@@ -143,6 +143,13 @@ const ProjectList = () => {
     }));
   };
 
+  const handleDeleteProject = (projectId: string, projectName: string) => {
+    if (window.confirm(`Are you sure you want to delete project "${projectName}"?`)) {
+      setProjects(projects.filter(project => project.id !== projectId));
+      toast.success(`Project "${projectName}" deleted successfully!`);
+    }
+  };
+
   const exportProjects = (projectType: 'ongoing' | 'completed') => {
     const projectsToExport = projectType === 'ongoing' ? ongoingProjects : completedProjects;
     const exportData = projectsToExport.map(project => ({
@@ -252,6 +259,14 @@ const ProjectList = () => {
                     <ProjectForm onSubmit={handleAddProject} initialData={editingProject} />
                   </DialogContent>
                 </Dialog>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteProject(project.id, project.name)}
+                  className="text-destructive hover:text-destructive/90"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
                 <Switch
                   checked={project.isCompleted}
                   onCheckedChange={() => toggleProjectStatus(project.id)}
