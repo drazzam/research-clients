@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,7 @@ type ProjectFormData = {
   client: string;
   description: string;
   notes: string;
-  files: FileList;
+  driveLink: string;
 };
 
 type ProjectFormProps = {
@@ -24,6 +23,7 @@ type ProjectFormProps = {
     client: string;
     description: string;
     notes?: string;
+    driveLink?: string;
   } | null;
 };
 
@@ -35,6 +35,7 @@ const ProjectForm = ({ onSubmit, initialData }: ProjectFormProps) => {
       client: initialData.client,
       description: initialData.description,
       notes: initialData.notes || '',
+      driveLink: initialData.driveLink || '',
     } : undefined
   });
 
@@ -119,25 +120,16 @@ const ProjectForm = ({ onSubmit, initialData }: ProjectFormProps) => {
         />
         <FormField
           control={form.control}
-          name="files"
-          render={({ field: { onChange, ...field } }) => (
+          name="driveLink"
+          render={({ field }) => (
             <FormItem>
-              <FormLabel>Attachments</FormLabel>
+              <FormLabel>Google Drive Folder Link</FormLabel>
               <FormControl>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    multiple
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      if (files) {
-                        onChange(files);
-                      }
-                    }}
-                    {...field}
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                  />
-                </div>
+                <Input 
+                  placeholder="Enter Google Drive folder URL" 
+                  type="url"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

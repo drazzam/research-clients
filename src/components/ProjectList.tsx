@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ArrowUpDown, Calendar, User, FileText, Paperclip, Download, Pencil } from 'lucide-react';
+import { ArrowUpDown, Calendar, User, FileText, Link as LinkIcon, Download, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProjectForm from './ProjectForm';
 import { Badge } from './ui/badge';
@@ -18,7 +17,7 @@ type Project = {
   description: string;
   isCompleted: boolean;
   notes?: string;
-  files: File[];
+  driveLink?: string;
 };
 
 const ProjectList = () => {
@@ -31,7 +30,7 @@ const ProjectList = () => {
       description: 'Building a modern e-commerce platform with React and Node.js',
       isCompleted: false,
       notes: 'Initial planning phase completed. Waiting for design approval.',
-      files: []
+      driveLink: 'https://drive.google.com/drive/folders/example1'
     },
     {
       id: '2',
@@ -41,7 +40,7 @@ const ProjectList = () => {
       description: 'Real-time analytics dashboard for business metrics',
       isCompleted: false,
       notes: 'API integration in progress',
-      files: []
+      driveLink: 'https://drive.google.com/drive/folders/example2'
     },
     {
       id: '3',
@@ -51,7 +50,7 @@ const ProjectList = () => {
       description: 'Cross-platform mobile application for task management',
       isCompleted: false,
       notes: 'UI/UX design phase',
-      files: []
+      driveLink: 'https://drive.google.com/drive/folders/example3'
     }
   ]);
 
@@ -102,13 +101,6 @@ const ProjectList = () => {
   };
 
   const handleAddProject = (formData: any) => {
-    const fileArray = Array.from(formData.files || []).map((file: any) => {
-      return new File([file], file.name, {
-        type: file.type,
-        lastModified: file.lastModified,
-      });
-    });
-
     const newProject: Project = {
       id: editingProject ? editingProject.id : (projects.length + 1).toString(),
       name: formData.name,
@@ -117,7 +109,7 @@ const ProjectList = () => {
       description: formData.description,
       isCompleted: editingProject ? editingProject.isCompleted : false,
       notes: formData.notes,
-      files: fileArray
+      driveLink: formData.driveLink
     };
     
     if (editingProject) {
@@ -158,7 +150,7 @@ const ProjectList = () => {
       client: project.client,
       description: project.description,
       notes: project.notes || 'No notes',
-      attachments: project.files.length,
+      driveLink: project.driveLink || 'No link',
       status: project.isCompleted ? 'Completed' : 'Ongoing'
     }));
 
@@ -206,7 +198,7 @@ const ProjectList = () => {
             Description & Notes
           </div>
           <div className="flex items-center justify-center">
-            Attachments
+            Drive Link
           </div>
           <div className="flex items-center justify-center">
             Actions
@@ -227,13 +219,17 @@ const ProjectList = () => {
                 )}
               </div>
               <div className="flex items-center justify-center">
-                {project.files && project.files.length > 0 ? (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Paperclip className="h-3 w-3" />
-                    {project.files.length}
-                  </Badge>
+                {project.driveLink ? (
+                  <a 
+                    href={project.driveLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary/80"
+                  >
+                    <LinkIcon className="h-4 w-4" />
+                  </a>
                 ) : (
-                  <span className="text-muted-foreground text-sm">No files</span>
+                  <span className="text-muted-foreground text-sm">No link</span>
                 )}
               </div>
               <div className="flex items-center justify-center gap-2">
