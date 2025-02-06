@@ -1,11 +1,11 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { toast } from 'sonner';
-import { Plus } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 
 type ProjectFormData = {
   name: string;
@@ -18,20 +18,36 @@ type ProjectFormData = {
 
 type ProjectFormProps = {
   onSubmit: (data: ProjectFormData) => void;
+  initialData?: {
+    name: string;
+    deadline: Date;
+    client: string;
+    description: string;
+    notes?: string;
+  } | null;
 };
 
-const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
-  const form = useForm<ProjectFormData>();
+const ProjectForm = ({ onSubmit, initialData }: ProjectFormProps) => {
+  const form = useForm<ProjectFormData>({
+    defaultValues: initialData ? {
+      name: initialData.name,
+      deadline: initialData.deadline.toISOString().split('T')[0],
+      client: initialData.client,
+      description: initialData.description,
+      notes: initialData.notes || '',
+    } : undefined
+  });
 
   const handleSubmit = (data: ProjectFormData) => {
     onSubmit(data);
-    form.reset();
-    toast.success("Project added successfully!");
+    if (!initialData) {
+      form.reset();
+    }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 mb-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -104,7 +120,7 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
         <FormField
           control={form.control}
           name="files"
-          render={({ field: { onChange, value, ...field } }) => (
+          render={({ field: { onChange, ...field } }) => (
             <FormItem>
               <FormLabel>Attachments</FormLabel>
               <FormControl>
@@ -113,8 +129,9 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
                     type="file"
                     multiple
                     onChange={(e) => {
-                      if (e.target.files) {
-                        onChange(e.target.files);
+                      const files = e.target.files;
+                      if (files) {
+                        onChange(files);
                       }
                     }}
                     {...field}
@@ -127,8 +144,17 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
           )}
         />
         <Button type="submit" className="w-full sm:w-auto">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Project
+          {initialData ? (
+            <>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Project
+            </>
+          )}
         </Button>
       </form>
     </Form>
