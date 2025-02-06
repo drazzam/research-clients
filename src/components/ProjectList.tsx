@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { ArrowUpDown, Calendar, User, FileText, Link as LinkIcon, Download, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,39 +21,59 @@ type Project = {
   driveLink?: string;
 };
 
+const STORAGE_KEY = 'research-projects';
+
 const ProjectList = () => {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: '1',
-      name: 'E-commerce Platform',
-      deadline: new Date('2024-05-15'),
-      client: 'TechCorp Inc.',
-      description: 'Building a modern e-commerce platform with React and Node.js',
-      isCompleted: false,
-      notes: 'Initial planning phase completed. Waiting for design approval.',
-      driveLink: 'https://drive.google.com/drive/folders/example1'
-    },
-    {
-      id: '2',
-      name: 'Analytics Dashboard',
-      deadline: new Date('2024-04-30'),
-      client: 'DataViz Solutions',
-      description: 'Real-time analytics dashboard for business metrics',
-      isCompleted: false,
-      notes: 'API integration in progress',
-      driveLink: 'https://drive.google.com/drive/folders/example2'
-    },
-    {
-      id: '3',
-      name: 'Mobile App',
-      deadline: new Date('2024-06-01'),
-      client: 'StartupX',
-      description: 'Cross-platform mobile application for task management',
-      isCompleted: false,
-      notes: 'UI/UX design phase',
-      driveLink: 'https://drive.google.com/drive/folders/example3'
+  const [projects, setProjects] = useState<Project[]>(() => {
+    // Load projects from localStorage on initial render
+    const savedProjects = localStorage.getItem(STORAGE_KEY);
+    if (savedProjects) {
+      const parsedProjects = JSON.parse(savedProjects);
+      // Convert string dates back to Date objects
+      return parsedProjects.map((project: any) => ({
+        ...project,
+        deadline: new Date(project.deadline)
+      }));
     }
-  ]);
+    // Return default projects if nothing in localStorage
+    return [
+      {
+        id: '1',
+        name: 'E-commerce Platform',
+        deadline: new Date('2024-05-15'),
+        client: 'TechCorp Inc.',
+        description: 'Building a modern e-commerce platform with React and Node.js',
+        isCompleted: false,
+        notes: 'Initial planning phase completed. Waiting for design approval.',
+        driveLink: 'https://drive.google.com/drive/folders/example1'
+      },
+      {
+        id: '2',
+        name: 'Analytics Dashboard',
+        deadline: new Date('2024-04-30'),
+        client: 'DataViz Solutions',
+        description: 'Real-time analytics dashboard for business metrics',
+        isCompleted: false,
+        notes: 'API integration in progress',
+        driveLink: 'https://drive.google.com/drive/folders/example2'
+      },
+      {
+        id: '3',
+        name: 'Mobile App',
+        deadline: new Date('2024-06-01'),
+        client: 'StartupX',
+        description: 'Cross-platform mobile application for task management',
+        isCompleted: false,
+        notes: 'UI/UX design phase',
+        driveLink: 'https://drive.google.com/drive/folders/example3'
+      }
+    ];
+  });
+
+  // Save to localStorage whenever projects change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  }, [projects]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Project;
