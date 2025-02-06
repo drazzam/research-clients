@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowUpDown, Calendar, User, FileText, Paperclip } from 'lucide-react';
@@ -116,14 +117,19 @@ const ProjectList = () => {
     };
     
     setProjects([...projects, newProject]);
-    toast.success("Project added successfully!");
+    toast.success(`Project "${formData.name}" added successfully!`);
   };
 
   const toggleProjectStatus = (projectId: string) => {
     setProjects(projects.map(project => {
       if (project.id === projectId) {
         const newStatus = !project.isCompleted;
-        toast.success(newStatus ? "Project completed" : "Project reopened");
+        const projectName = project.name;
+        toast.success(
+          newStatus 
+            ? `Project "${projectName}" marked as complete`
+            : `Project "${projectName}" moved back to ongoing projects`
+        );
         return { ...project, isCompleted: newStatus };
       }
       return project;
