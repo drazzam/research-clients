@@ -5,13 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 
 type ProjectFormData = {
   name: string;
   deadline: string;
   client: string;
   description: string;
+  notes: string;
+  files: FileList;
 };
 
 type ProjectFormProps = {
@@ -77,6 +79,44 @@ const ProjectForm = ({ onSubmit }: ProjectFormProps) => {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea placeholder="Enter project description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Add any additional notes or comments" 
+                  className="min-h-[100px]"
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="files"
+          render={({ field: { onChange, ...field } }) => (
+            <FormItem>
+              <FormLabel>Attachments</FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    multiple
+                    onChange={(e) => onChange(e.target.files)}
+                    {...field}
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>

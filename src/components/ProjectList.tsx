@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ArrowUpDown, Calendar, User, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowUpDown, Calendar, User, FileText, CheckCircle, XCircle, Paperclip } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProjectForm from './ProjectForm';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
-import { toast } from './ui/use-toast';
+import { toast } from 'sonner';
 
 type Project = {
   id: string;
@@ -14,6 +14,8 @@ type Project = {
   client: string;
   description: string;
   isCompleted: boolean;
+  notes?: string;
+  files?: File[];
 };
 
 const ProjectList = () => {
@@ -24,7 +26,9 @@ const ProjectList = () => {
       deadline: new Date('2024-05-15'),
       client: 'TechCorp Inc.',
       description: 'Building a modern e-commerce platform with React and Node.js',
-      isCompleted: false
+      isCompleted: false,
+      notes: 'Initial planning phase completed. Waiting for design approval.',
+      files: []
     },
     {
       id: '2',
@@ -32,7 +36,9 @@ const ProjectList = () => {
       deadline: new Date('2024-04-30'),
       client: 'DataViz Solutions',
       description: 'Real-time analytics dashboard for business metrics',
-      isCompleted: false
+      isCompleted: false,
+      notes: 'API integration in progress',
+      files: []
     },
     {
       id: '3',
@@ -40,7 +46,9 @@ const ProjectList = () => {
       deadline: new Date('2024-06-01'),
       client: 'StartupX',
       description: 'Cross-platform mobile application for task management',
-      isCompleted: false
+      isCompleted: false,
+      notes: 'UI/UX design phase',
+      files: []
     }
   ]);
 
@@ -89,19 +97,19 @@ const ProjectList = () => {
   };
 
   const handleAddProject = (formData: any) => {
+    const files = Array.from(formData.files || []);
     const newProject = {
       id: (projects.length + 1).toString(),
       name: formData.name,
       deadline: new Date(formData.deadline),
       client: formData.client,
       description: formData.description,
-      isCompleted: false
+      isCompleted: false,
+      notes: formData.notes,
+      files: files
     };
     setProjects([...projects, newProject]);
-    toast({
-      title: "Project added",
-      description: "New project has been successfully added.",
-    });
+    toast.success("Project added successfully!");
   };
 
   const toggleProjectStatus = (projectId: string) => {
@@ -122,7 +130,7 @@ const ProjectList = () => {
     <div className="bg-card rounded-lg shadow-sm border overflow-x-auto mt-8">
       <h2 className="text-xl font-semibold p-4 border-b">{title}</h2>
       <div className="min-w-[800px]">
-        <div className="grid grid-cols-6 gap-4 p-4 font-medium border-b">
+        <div className="grid grid-cols-7 gap-4 p-4 font-medium border-b">
           <button onClick={() => sortProjects('name')} className="sort-button">
             Project Name {getSortIcon('name')}
           </button>
@@ -136,7 +144,10 @@ const ProjectList = () => {
           </button>
           <div className="col-span-2 flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Description
+            Description & Notes
+          </div>
+          <div className="flex items-center justify-center">
+            Attachments
           </div>
           <div className="flex items-center justify-center">
             Status
@@ -144,11 +155,28 @@ const ProjectList = () => {
         </div>
         <div className="divide-y">
           {projects.map((project) => (
-            <div key={project.id} className="grid grid-cols-6 gap-4 p-4 project-row hover:bg-muted/50 transition-colors">
+            <div key={project.id} className="grid grid-cols-7 gap-4 p-4 project-row hover:bg-muted/50 transition-colors">
               <div className="font-medium text-primary">{project.name}</div>
               <div>{format(project.deadline, 'MMM dd, yyyy')}</div>
               <div>{project.client}</div>
-              <div className="col-span-2 text-muted-foreground">{project.description}</div>
+              <div className="col-span-2">
+                <p className="text-muted-foreground">{project.description}</p>
+                {project.notes && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    <span className="font-medium">Notes:</span> {project.notes}
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center justify-center">
+                {project.files && project.files.length > 0 ? (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Paperclip className="h-3 w-3" />
+                    {project.files.length}
+                  </Badge>
+                ) : (
+                  <span className="text-muted-foreground text-sm">No files</span>
+                )}
+              </div>
               <div className="flex items-center justify-center">
                 <Switch
                   checked={project.isCompleted}
