@@ -43,3 +43,13 @@
 .sort-button {
   @apply inline-flex items-center gap-1 hover:text-primary transition-colors duration-200;
 }
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

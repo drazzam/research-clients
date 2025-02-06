@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowUpDown, Calendar, User, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ProjectForm from './ProjectForm';
 
 type Project = {
   id: string;
@@ -74,36 +75,52 @@ const ProjectList = () => {
     return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
   };
 
+  const handleAddProject = (formData: any) => {
+    const newProject = {
+      id: (projects.length + 1).toString(),
+      name: formData.name,
+      deadline: new Date(formData.deadline),
+      client: formData.client,
+      description: formData.description
+    };
+    setProjects([...projects, newProject]);
+  };
+
   return (
-    <div className="w-full max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Projects</h1>
-      <div className="bg-card rounded-lg shadow-sm border">
-        <div className="grid grid-cols-5 gap-4 p-4 font-medium border-b">
-          <button onClick={() => sortProjects('name')} className="sort-button">
-            Project Name {getSortIcon('name')}
-          </button>
-          <button onClick={() => sortProjects('deadline')} className="sort-button">
-            <Calendar className="h-4 w-4" />
-            Deadline {getSortIcon('deadline')}
-          </button>
-          <button onClick={() => sortProjects('client')} className="sort-button">
-            <User className="h-4 w-4" />
-            Client {getSortIcon('client')}
-          </button>
-          <div className="col-span-2 flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Description
-          </div>
-        </div>
-        <div className="divide-y">
-          {projects.map((project) => (
-            <div key={project.id} className="grid grid-cols-5 gap-4 p-4 project-row">
-              <div className="font-medium text-primary">{project.name}</div>
-              <div>{format(project.deadline, 'MMM dd, yyyy')}</div>
-              <div>{project.client}</div>
-              <div className="col-span-2 text-muted-foreground">{project.description}</div>
+    <div className="w-full max-w-6xl mx-auto p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-8">Projects</h1>
+      
+      <ProjectForm onSubmit={handleAddProject} />
+
+      <div className="bg-card rounded-lg shadow-sm border overflow-x-auto">
+        <div className="min-w-[800px]">
+          <div className="grid grid-cols-5 gap-4 p-4 font-medium border-b">
+            <button onClick={() => sortProjects('name')} className="sort-button">
+              Project Name {getSortIcon('name')}
+            </button>
+            <button onClick={() => sortProjects('deadline')} className="sort-button">
+              <Calendar className="h-4 w-4" />
+              Deadline {getSortIcon('deadline')}
+            </button>
+            <button onClick={() => sortProjects('client')} className="sort-button">
+              <User className="h-4 w-4" />
+              Client {getSortIcon('client')}
+            </button>
+            <div className="col-span-2 flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Description
             </div>
-          ))}
+          </div>
+          <div className="divide-y">
+            {projects.map((project) => (
+              <div key={project.id} className="grid grid-cols-5 gap-4 p-4 project-row">
+                <div className="font-medium text-primary">{project.name}</div>
+                <div>{format(project.deadline, 'MMM dd, yyyy')}</div>
+                <div>{project.client}</div>
+                <div className="col-span-2 text-muted-foreground">{project.description}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
